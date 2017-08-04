@@ -108,6 +108,17 @@ configuration:
                 app_instance: { type: str }
                #display_name: { type: str } (optional)
 
+    setup_directory:
+        type: str
+        default_value: ""
+        description: "Determines where the project setup directory tree will be located when a new
+                     project is created. An empty string value, which is the default, indicates
+                     that project creation should put the setup directory in the standard location
+                     defined by Autodesk. A non-empty string value must evaluate to a valid path
+                     and may contain any of the following substitution tokens:
+                        '{project_path}' : full path to the current project's root directory
+                     "
+
 # the Shotgun fields that this engine needs in order to operate correctly
 requires_shotgun_fields:
 

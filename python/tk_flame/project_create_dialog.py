@@ -8,6 +8,7 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+import os
 import sgtk
 from sgtk import TankError
 from sgtk.platform.qt import QtCore, QtGui
@@ -64,7 +65,8 @@ class ProjectCreateDialog(QtGui.QWidget):
         
         # populate fixed fields (the first tab)
         self.ui.project_name.setText(project_name)
-        self.ui.setup_dir.setPlaceholderText("<default>")
+        self.ui.setup_dir.setPlaceholderText("Leave blank for Autodesk default")
+        self.ui.setup_dir.setText(self.__get_setup_directory())
         self.ui.user_name.setText(user_name)
         if workspace_name:
             self.ui.workspace_name.setText(workspace_name)
@@ -104,6 +106,24 @@ class ProjectCreateDialog(QtGui.QWidget):
             self.ui.tabWidget.removeTab(self.TAB_OLD_PROXY)
             # init new settings tab
             self.__set_up_new_proxy_tab(project_settings)
+
+    def __get_setup_directory(self):
+        """
+        Return the value of the setup_directory string from the engine settings
+        formatted, expanded, and normalized into an absolute full path.
+
+        If this string is empty, then the default Autodesk setup directory will
+        be used during new project creation. The following special tokens will
+        be expanded as follows:
+
+            {project_path}      Project path root as defined by Tank
+        """
+        # format and expand setup_directory string, and return a normalized absolute path
+        formatted_string = self._engine.get_setting("setup_directory", "").format(
+            # expandable tokens:
+            project_path=self._engine.sgtk.project_path,
+        )
+        return os.path.abspath(os.path.normpath(os.path.expanduser(formatted_string)))
 
     def __populate_resolution_tab(self, project_settings):
         """
